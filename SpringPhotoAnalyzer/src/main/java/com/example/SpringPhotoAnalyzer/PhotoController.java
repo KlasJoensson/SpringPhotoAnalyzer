@@ -27,17 +27,18 @@ import org.springframework.web.servlet.view.RedirectView;
 @Controller
 public class PhotoController {
 
+	private S3Service s3Client;
+	private AnalyzePhotos photos;
+	private WriteExcel excel;
+	private SendMessages sendMessage;
+	
 	@Autowired
-	S3Service s3Client;
-
-	@Autowired
-	AnalyzePhotos photos;
-
-	@Autowired
-	WriteExcel excel ;
-
-	@Autowired
-	SendMessages sendMessage;
+	public PhotoController(SendMessages sendMessage, WriteExcel excel, AnalyzePhotos photos, S3Service s3Client) {
+		this.sendMessage = sendMessage;
+		this.excel = excel;
+		this.photos = photos;
+		this.s3Client = s3Client;
+	}
 	
 	private Logger logger = LoggerFactory.getLogger(PhotoController.class);
 
