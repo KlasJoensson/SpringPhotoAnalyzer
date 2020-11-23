@@ -3,6 +3,8 @@ package com.example.SpringPhotoAnalyzer;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
@@ -24,6 +26,8 @@ import software.amazon.awssdk.services.rekognition.model.RekognitionException;
 public class AnalyzePhotos {
 	
 	private Region region;
+	
+	private Logger logger = LoggerFactory.getLogger(AnalyzePhotos.class);
 	
 	@Autowired
 	public AnalyzePhotos(Environment env) {
@@ -56,7 +60,7 @@ public class AnalyzePhotos {
 	        // Write the results to a WorkItem instance
 	        List<Label> labels = labelsResponse.labels();
 
-	        System.out.println("Detected labels for the given photo");
+	        logger.debug("Detected labels for the given photo");
 
 	        ArrayList list = new ArrayList<WorkItem>();
 	        WorkItem item ;
@@ -70,7 +74,7 @@ public class AnalyzePhotos {
 	        return list;
 
 	    } catch (RekognitionException e) {
-	        System.out.println(e.getMessage());
+	        logger.error("Ops, something didn't work out right: " + e.getMessage());
 	        System.exit(1);
 	    }
 	    return null ;

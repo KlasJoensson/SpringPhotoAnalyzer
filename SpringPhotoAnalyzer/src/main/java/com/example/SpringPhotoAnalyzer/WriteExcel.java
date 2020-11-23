@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import jxl.CellView;
@@ -26,6 +28,7 @@ public class WriteExcel {
 
 	 private WritableCellFormat timesBoldUnderline;
 	 private WritableCellFormat times;
+	 private Logger logger = LoggerFactory.getLogger(PhotoController.class);
 
 	 // Returns an InputStream that represents the Excel report
 	 public java.io.InputStream exportExcel( List<List> list) {
@@ -34,7 +37,7 @@ public class WriteExcel {
 	        java.io.InputStream is = write(list);
 	        return is ;
 	    } catch(WriteException | IOException e) {
-	        e.printStackTrace();
+	        logger.error("Ops, somthing went wrong when exporting the spread sheet: " + e.getMessage());
 	    }
 	    return null;
 	 }

@@ -15,6 +15,8 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
@@ -42,7 +44,10 @@ import software.amazon.awssdk.services.s3.model.S3Object;
 public class S3Service {
 
 	private S3Client s3;
+	
 	private Region region;
+	
+	private Logger logger = LoggerFactory.getLogger(AnalyzePhotos.class);
 	
 	@Autowired
 	public S3Service(Environment env) {
@@ -78,7 +83,7 @@ public class S3Service {
 	        return data;
 
 	    } catch (S3Exception e) {
-	        System.err.println(e.awsErrorDetails().errorMessage());
+	    	logger.error("Ops, something didn't work out with the S3-backet: " + e.awsErrorDetails().errorMessage());
 	        System.exit(1);
 	    }
 	    return null;
@@ -119,7 +124,8 @@ public class S3Service {
 	        return convertToString(toXml(bucketItems));
 
 	    } catch (S3Exception e) {
-	        System.err.println(e.awsErrorDetails().errorMessage());
+	    	logger.error("Ops, something didn't work out with listing the objects in the S3-bucket: " 
+	    			+ e.awsErrorDetails().errorMessage());
 	        System.exit(1);
 	    }
 	    return null ;
@@ -151,7 +157,8 @@ public class S3Service {
 	       return keys;
 
 	    } catch (S3Exception e) {
-	        System.err.println(e.awsErrorDetails().errorMessage());
+	    	logger.error("Ops, something didn't work out with listing the objects in the S3-bucket '" + bucketName + "': " 
+	    			+ e.awsErrorDetails().errorMessage());
 	        System.exit(1);
 	    }
 	    return null ;
@@ -174,7 +181,7 @@ public class S3Service {
 	        return response.eTag();
 
 	    } catch (S3Exception e) {
-	        System.err.println(e.getMessage());
+	    	logger.error("Ops, could not put the object in the S3-bucket: " + e.awsErrorDetails().errorMessage());
 	        System.exit(1);
 	    }
 	    return "";
@@ -227,7 +234,7 @@ public class S3Service {
 
 	        return doc;
 	    } catch(ParserConfigurationException e) {
-	        e.printStackTrace();
+	    	logger.error("Could not parse the xml: " + e.getLocalizedMessage());
 	    }
 	    return null;
 	  }
@@ -241,7 +248,7 @@ public class S3Service {
 	        return result.getWriter().toString();
 
 	    } catch(TransformerException ex) {
-	        ex.printStackTrace();
+	    	logger.error("Could not convert the xml to a string: " + ex.getLocalizedMessage());
 	    }
 	    return null;
 	    }

@@ -8,6 +8,8 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -36,6 +38,8 @@ public class PhotoController {
 
 	@Autowired
 	SendMessages sendMessage;
+	
+	private Logger logger = LoggerFactory.getLogger(PhotoController.class);
 
 	@GetMapping("/")
 	public String root() {
@@ -93,8 +97,7 @@ public class PhotoController {
 			sendMessage.sendReport(excelData, email);
 
 		} catch (Exception e) {
-
-			e.printStackTrace();
+			logger.debug("Ops, somethong went wrong when sending the message: " + e.getLocalizedMessage());
 		}
 		return "The photos have been analyzed and the report is sent.";
 	}
@@ -114,7 +117,7 @@ public class PhotoController {
 			s3Client.putObject(bytes, "scottphoto", name);
 
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.debug("Ops, somethong went wrong when trying to upload the file: " + e.getLocalizedMessage());
 		}
 		return new ModelAndView(new RedirectView("photo"));
 	}

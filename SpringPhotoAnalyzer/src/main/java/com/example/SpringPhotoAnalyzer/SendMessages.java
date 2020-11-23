@@ -18,6 +18,8 @@ import javax.mail.internet.MimeMultipart;
 import javax.mail.util.ByteArrayDataSource;
 
 import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
@@ -39,6 +41,8 @@ public class SendMessages {
 	private Region region;
 	
 	private String sender;
+	
+	private Logger logger = LoggerFactory.getLogger(SendMessages.class);
 
 	// The subject line for the email
 	private String subject = "Analyzed photos report";
@@ -64,7 +68,7 @@ public class SendMessages {
 		try {
 			send(fileContent,emailAddress);
 		} catch (MessagingException e) {
-			e.getStackTrace();
+			logger.error("Oops, could not send message: " + e.getMessage());
 		}
 	}
 
@@ -124,7 +128,7 @@ public class SendMessages {
 
 		// Try to send the email
 		try {
-			System.out.println("Attempting to send an email through Amazon SES " + "using the AWS SDK for Java...");
+			logger.debug("Attempting to send an email through Amazon SES using the AWS SDK for Java...");
 
 			SesClient client = SesClient.builder()
 					.credentialsProvider(EnvironmentVariableCredentialsProvider.create())
@@ -149,9 +153,9 @@ public class SendMessages {
 			client.sendRawEmail(rawEmailRequest);
 
 		} catch (SesException e) {
-			System.err.println(e.awsErrorDetails().errorMessage());
+			logger.error("Ops, could not attach the file... " + e.awsErrorDetails().errorMessage());
 			System.exit(1);
 		}
-		System.out.println("Email sent with attachment.");
+		logger.debug("Email sent with attachment.");
 	}
 }
