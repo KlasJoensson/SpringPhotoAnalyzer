@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,13 +32,16 @@ public class PhotoController {
 	private AnalyzePhotos photos;
 	private WriteExcel excel;
 	private SendMessages sendMessage;
+	private String bucketName = "scottphoto";
 	
 	@Autowired
-	public PhotoController(SendMessages sendMessage, WriteExcel excel, AnalyzePhotos photos, S3Service s3Client) {
+	public PhotoController(SendMessages sendMessage, WriteExcel excel, 
+			AnalyzePhotos photos, S3Service s3Client, Environment env) {
 		this.sendMessage = sendMessage;
 		this.excel = excel;
 		this.photos = photos;
 		this.s3Client = s3Client;
+		this.bucketName = env.getProperty("bucket.name");
 	}
 	
 	private Logger logger = LoggerFactory.getLogger(PhotoController.class);
@@ -61,7 +65,7 @@ public class PhotoController {
 	@ResponseBody
 	String getImages(HttpServletRequest request, HttpServletResponse response) {
 
-		return s3Client.ListAllObjects("scottphoto");
+		return s3Client.ListAllObjects(bucketName);
 	}
 
 	// Generate a report that analyzes photos in a given bucket
@@ -72,7 +76,7 @@ public class PhotoController {
 		String email = request.getParameter("email");
 
 		// Get a list of key names in the given bucket
-		List myKeys =  s3Client.ListBucketObjects("scottphoto");
+		List myKeys =  s3Client.ListBucketObjects(bucketName);
 
 		// Create a list to store the data
 		List myList = new ArrayList<List>();
@@ -82,7 +86,7 @@ public class PhotoController {
 		for (int z=0 ; z < len; z++) {
 
 			String key = (String) myKeys.get(z);
-			byte[] keyData = s3Client.getObjectBytes ("scottphoto", key);
+			byte[] keyData = s3Client.getObjectBytes (bucketName, key);
 			//myMap.put(key, keyData);
 
 			// Analyze the photo
@@ -115,7 +119,7 @@ public class PhotoController {
 			String name =  file.getOriginalFilename() ;
 
 			// Put the file into the bucket
-			s3Client.putObject(bytes, "scottphoto", name);
+			s3Client.putObject(bytes, bucketName, name);
 
 		} catch (IOException e) {
 			logger.debug("Ops, somethong went wrong when trying to upload the file: " + e.getLocalizedMessage());
