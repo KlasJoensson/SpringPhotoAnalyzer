@@ -102,7 +102,7 @@ public class PhotoController {
 			sendMessage.sendReport(excelData, email);
 
 		} catch (Exception e) {
-			logger.debug("Ops, somethong went wrong when sending the message: " + e.getLocalizedMessage());
+			logger.error("Ops, somethong went wrong when sending the message: " + e.getLocalizedMessage());
 		}
 		return "The photos have been analyzed and the report is sent.";
 	}
