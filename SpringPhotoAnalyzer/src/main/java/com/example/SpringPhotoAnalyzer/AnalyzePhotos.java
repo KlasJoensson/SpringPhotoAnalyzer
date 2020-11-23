@@ -3,6 +3,8 @@ package com.example.SpringPhotoAnalyzer;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import software.amazon.awssdk.auth.credentials.EnvironmentVariableCredentialsProvider;
@@ -20,9 +22,16 @@ import software.amazon.awssdk.services.rekognition.model.RekognitionException;
  */
 @Component
 public class AnalyzePhotos {
+	
+	private Region region;
+	
+	@Autowired
+	public AnalyzePhotos(Environment env) {
+		this.region = Region.of(env.getProperty("aws.region"));
+	}
+	
 	public ArrayList DetectLabels(byte[] bytes, String key) {
 
-	    Region region = Region.US_EAST_2;
 	    RekognitionClient rekClient = RekognitionClient.builder()
 	            .credentialsProvider(EnvironmentVariableCredentialsProvider.create())
 	            .region(region)

@@ -15,6 +15,8 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -40,10 +42,16 @@ import software.amazon.awssdk.services.s3.model.S3Object;
 public class S3Service {
 
 	private S3Client s3;
+	private Region region;
+	
+	@Autowired
+	public S3Service(Environment env) {
+		this.region = Region.of(env.getProperty("aws.region"));
+	}
 
 	private S3Client getClient() {
+		
 	    // Create the S3Client object
-	    Region region = Region.US_WEST_2;
 	    S3Client s3 = S3Client.builder()
 	            .credentialsProvider(EnvironmentVariableCredentialsProvider.create())
 	            .region(region)

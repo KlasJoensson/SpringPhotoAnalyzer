@@ -18,6 +18,8 @@ import javax.mail.internet.MimeMultipart;
 import javax.mail.util.ByteArrayDataSource;
 
 import org.apache.commons.io.IOUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import software.amazon.awssdk.auth.credentials.EnvironmentVariableCredentialsProvider;
@@ -34,7 +36,9 @@ import software.amazon.awssdk.services.ses.model.SesException;
 @Component
 public class SendMessages {
 	
-	private String sender = "<enter email address>";
+	private Region region;
+	
+	private String sender;
 
 	// The subject line for the email
 	private String subject = "Analyzed photos report";
@@ -46,6 +50,12 @@ public class SendMessages {
 	private String bodyHTML = "<html>" + "<head></head>" + "<body>" + "<h1>Hello!</h1>"
 			+ "<p>Please see the attached file for the report that analyzed photos in the S3 bucket.</p>" + "</body>" + "</html>";
 
+	@Autowired
+	public SendMessages(Environment env) {
+		this.region = Region.of(env.getProperty("aws.region"));
+		this.sender = env.getProperty("sender.email");
+	}
+	
 	public void sendReport(InputStream is, String emailAddress ) throws IOException {
 
 		// Convert the InputStream to a byte[]
@@ -116,7 +126,6 @@ public class SendMessages {
 		try {
 			System.out.println("Attempting to send an email through Amazon SES " + "using the AWS SDK for Java...");
 
-			Region region = Region.US_WEST_2;
 			SesClient client = SesClient.builder()
 					.credentialsProvider(EnvironmentVariableCredentialsProvider.create())
 					.region(region)
