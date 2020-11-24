@@ -21,6 +21,19 @@ import software.amazon.awssdk.services.rekognition.model.RekognitionException;
 
 /**
  * Uses the Amazon Recognition API to analyze the images.
+ * The API is only availably from this regions:
+	Asia Pacific (Mumbai)
+	Europe (London)
+	Europe (Ireland)
+	Asia Pacific (Seoul)
+	Asia Pacific (Tokyo)
+	Asia Pacific (Singapore)
+	Asia Pacific (Sydney)
+	Europe (Frankfurt)
+	US East (N. Virginia)
+	US East (Ohio)
+	US West (N. California)
+	US West (Oregon)
  */
 @Component
 public class AnalyzePhotos {
@@ -31,7 +44,7 @@ public class AnalyzePhotos {
 	
 	@Autowired
 	public AnalyzePhotos(Environment env) {
-		this.region = Region.of(env.getProperty("aws.region"));
+		this.region = Region.of(env.getProperty("aws.recognition.region"));
 	}
 	
 	public ArrayList DetectLabels(byte[] bytes, String key) {
@@ -44,23 +57,21 @@ public class AnalyzePhotos {
 	    try {
 
 	        SdkBytes sourceBytes = SdkBytes.fromByteArray(bytes);
-
+	        
 	        // Create an Image object for the source image
 	        Image souImage = Image.builder()
 	                .bytes(sourceBytes)
 	                .build();
-
+	        
 	        DetectLabelsRequest detectLabelsRequest = DetectLabelsRequest.builder()
 	                .image(souImage)
 	                .maxLabels(10)
 	                .build();
 
-	        DetectLabelsResponse labelsResponse = rekClient.detectLabels(detectLabelsRequest);
+		    DetectLabelsResponse labelsResponse = rekClient.detectLabels(detectLabelsRequest);
 
 	        // Write the results to a WorkItem instance
 	        List<Label> labels = labelsResponse.labels();
-
-	        logger.debug("Detected labels for the given photo");
 
 	        ArrayList list = new ArrayList<WorkItem>();
 	        WorkItem item ;
