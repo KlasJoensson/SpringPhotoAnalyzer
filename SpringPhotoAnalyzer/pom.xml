@@ -85,11 +85,11 @@
 			<artifactId>javax.mail-api</artifactId>
 			<version>1.6.2</version>
 		</dependency>
-		<!--  dependency> Why is this in the dependencies, seems to be a duplicate...
+		<dependency> <!--This is needed to make it send the mail for som reason..-->
 			<groupId>javax.mail</groupId>
 			<artifactId>javax.mail-api</artifactId>
 			<version>1.5.5</version>
-		</dependency-->
+		</dependency>
 		<dependency>
 			<groupId>com.sun.mail</groupId>
 			<artifactId>javax.mail</artifactId>
